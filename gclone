@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# USAGE: . gclone <repo URI>
+gclone_repo $@ > /tmp/gclone_output_023mf023mf
+EXIT_CODE=$?
+
+# Error checking
+if [[ $EXIT_CODE != 0 ]]; then
+    cat /tmp/gclone_output_023mf023mf
+    exit $EXIT_CODE
+fi
+
+DIR=$(cat /tmp/gclone_output_023mf023mf)
+
+if [ -z $YK_FISH_EXISTS ]; then
+    cd $DIR
+else
+    echo $DIR
+fi

@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+import os
+import re
+import subprocess
+import argparse
+import sys
+from pathlib import Path
+
+DEBUG = True
+
+def print_err(txt):
+    print(txt, file=sys.stderr)
+
+def os_env(key):
+    dir = os.environ.get(key)
+    if dir == None or len(dir) < 1:
+        print_err("Missing environment variable " + key)
+        sys.exit(1)
+    
+    return dir
+
+# https://github.com/yngvark/aws-console-signin-robot.git > yngvark
+def get_org_from_git_url(gitRepoUrl):
+    pattern = re.compile(r'([a-zA-Z0-9\.\-]+)/')
+
+    matches = re.findall(pattern, gitRepoUrl)
+    if len(matches) > 0:
+        return matches[len(matches) - 1]
+
+    raise ValueError("Could not find GIT organization")
+
+# https://github.com/yngvark/aws-console-signin-robot.git > aws-console-signin-robot
+def get_reponame_from_git_url(gitRepoUrl):
+    pattern = re.compile(r'([a-zA-Z0-9\-_]+)\.git')
+
+    matches = re.findall(pattern, gitRepoUrl)
+    if len(matches) > 0:
+        return matches[len(matches) - 1]
+
+    raise ValueError("Could not find GIT repo name")
+
+def print_invalid_gir_uri_message(invalidInput):
+    print("Not a valid repository URI: " + invalidInput)
+    print("")
+    print("Examples of a correct URI:")
+    print("git@github.com:someone/some-repo.git")
+    print("https://github.com/someone/some-repo.git")
+
+# Parse args
+parser = argparse.ArgumentParser(description="git clones a repo URL to the appropriate directory. Tip: " \
+    + "use \". gclone <args>\" to change directory to cloned directory.")
+parser.add_argument("repoUrl", type=str, help="URL of the repo to clone")
+parser.add_argument("-t", "--temp", action='store_true', default=False, help="Clone the repository in a temporary directory")
+
+args = parser.parse_args()
+
+# Get org and repo from URI
+try:
+    org = get_org_from_git_url(args.repoUrl)
+except ValueError:
+    print_invalid_gir_uri_message(args.repoUrl)
+    sys.exit(1)
+
+print("Organization: " + org, file=sys.stderr)
+try:
+    reponameDir = get_reponame_from_git_url(args.repoUrl)
+except ValueError:
+    print_invalid_gir_uri_message(args.repoUrl)
+    sys.exit(1)
+
+# Clone or pull repo
+gitdir = ""
+if args.temp:
+    gitDir = os_env("GCLONE_GIT_TEMP_DIR")
+else:
+    gitDir = os_env("GCLONE_GIT_DIR")
+
+if not os.path.exists(gitDir):
+  os.makedirs(gitDir)
+
+cloneDir = Path(gitDir).joinpath(org).joinpath(reponameDir)
+
+Path(cloneDir.parent).mkdir(parents=True, exist_ok=True)
+
+if os.path.exists(cloneDir):
+    print(f"Pulling in existing directory: {cloneDir}", file=sys.stderr)
+    subprocess.run(["git", "pull"], check=True, cwd=cloneDir, stdout=subprocess.DEVNULL)
+else:
+    print(f"Cloning in directory: {cloneDir}", file=sys.stderr)
+    subprocess.run(["git", "clone", args.repoUrl], check=True, cwd=cloneDir.parent, stdout=subprocess.DEVNULL)
+
+print(cloneDir)

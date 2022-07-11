@@ -11,14 +11,12 @@ DEFAULT_REPO_ENV_NAME = "REPONEW_DEFAULT_ORGANIZATION"
 def parse_args():
     parser = argparse.ArgumentParser(description="Creates a new Github repository.")
     parser.add_argument("repoId", type=str, help="Organization (optinal) and repository name. Example: myorg/myrepo")
-    parser.add_argument("-n", "--dry-run", action='store_true', help="Don't make any changes")
-    parser.add_argument("-p", "--private", action='store_true', default=False, help="Make the new repository private")
+    parser.add_argument("-n", "--dry-run", action=argparse.BooleanOptionalAction, help="Don't make any changes")
+    parser.add_argument("-p", "--private", action=argparse.BooleanOptionalAction, help="Make the new repository private")
     parser.add_argument("-t", "--template", type=str, help="repository for template. For instance 'myorg/mytemplaterepo'")
     parser.add_argument("-d", "--description", type=str, help="the description for the repository")
 
     # When python 3.9 arrives:
-    # parser.add_argument("-d", "--dry-run", action=argparse.BooleanOptionalAction, help="Don't make any changes")
-    # parser.add_argument("-p", "--private", action=argparse.BooleanOptionalAction, default=False, help="Make the new repository private")
 
     return parser.parse_args()
 
@@ -27,11 +25,11 @@ def print_err(txt):
     print(txt, file=sys.stderr)
 
 
-def validate_args(args):
+def validate_args(cmd_args):
     error = False
     err = None
 
-    if len(args.repoId.split("/")) > 2:
+    if len(cmd_args.repoId.split("/")) > 2:
         err = "repoId must be on the form: org/repo"
         error = True
 
@@ -40,16 +38,16 @@ def validate_args(args):
         sys.exit(1)
 
 
-def get_organization(repoId):
-    split = repoId.split("/")
-    
+def get_organization(repo_id):
+    split = repo_id.split("/")
+
     if len(split) == 1:
-        org = default_org()
-        if org == None:
-            print_err("ERROR: You didn't provide a organization, and you haven't set the environment variable " \
-                + DEFAULT_REPO_ENV_NAME + ", so it's impossible to figure out which organization to use.")
+        o = default_org()
+        if o is None:
+            print_err("ERROR: You didn't provide a organization, and you haven't set the environment variable "
+                      + DEFAULT_REPO_ENV_NAME + ", so it's impossible to figure out which organization to use.")
             sys.exit(1)
-        return org
+        return o
 
     return split[0]
 
@@ -58,41 +56,41 @@ def default_org():
     return os.environ.get("REPONEW_DEFAULT_ORGANIZATION")
 
 
-def get_repository_name(repoId):
-    return repoId.split("/")[-1]
+def get_repository_name(repo_id):
+    return repo_id.split("/")[-1]
 
 
 def git_dir():
-    dir = os.environ.get("GCLONE_GIT_DIR")
-    if dir == None:
+    d = os.environ.get("GCLONE_GIT_DIR")
+    if d is None:
         raise "Missing environment variable GCLONE_GIT_DIR. Set it to the directory where you contain git " \
-            + "repositories"
-    
-    return dir
+              + "repositories"
+
+    return d
 
 
-def create_dir(dir):
-    if os.path.exists(dir):
+def create_dir(d):
+    if os.path.exists(d):
         print_err(f"ERROR: Directory already exists:")
-        print_err(dir)
+        print_err(d)
         sys.exit(1)
 
-    #print_err(f"Creating directory {repoDir}")
+    # print_err(f"Creating directory {repoDir}")
     Path(repoDir).mkdir(parents=True, exist_ok=True)
 
 
-def get_private_public_arg(privateArg):
-    if privateArg:
+def get_private_public_arg(private_arg):
+    if private_arg:
         return "--private"
 
     return "--public"
 
 
-def run_cmd(cmd, repoDir):
-    print_err("Command: " + " ".join(cmd))
-    p = Popen(cmd, cwd=repoDir, stdout=PIPE, stderr=PIPE)
+def run_cmd(command, repo_dir):
+    print_err("Command: " + " ".join(command))
+    p = Popen(command, cwd=repo_dir, stdout=PIPE, stderr=PIPE)
     output, error = p.communicate()
-    if p.returncode != 0: 
+    if p.returncode != 0:
         print_err("ERROR, response from gh (exit code %d): %s %s" % (p.returncode, output, error))
         sys.exit(1)
 
@@ -107,7 +105,7 @@ org = get_organization(args.repoId)
 repo = get_repository_name(args.repoId)
 gitDir = git_dir()
 repoDir = Path(gitDir).joinpath(org).joinpath(repo)
-privatePublicArg = get_private_public_arg(args.private)
+gh_private_public_argh = get_private_public_arg(args.private)
 
 # print_err("org: " + org)
 # print_err("repo: " + repo)
@@ -119,7 +117,7 @@ else:
 
 org_with_repo = f"{org}/{repo}"
 
-cmd = ["gh", "repo", "create", "--clone", org_with_repo, privatePublicArg]
+cmd = ["gh", "repo", "create", "--clone", org_with_repo, gh_private_public_argh]
 
 if args.template is not None and len(args.template) > 0:
     cmd.append("--template")
@@ -132,5 +130,6 @@ if args.description is not None and len(args.description) > 0:
 if not args.dry_run:
     run_cmd(cmd, repoDir.parent)
 
-print_err(f"Successfully created repository in directory " + str(repoDir))
+private_or_public = "private" if args.private else "public"
+print_err(f"Successfully created {private_or_public} repository in directory " + str(repoDir))
 print(repoDir)

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # USAGE: . gclone <repo URI>
+
+# shellcheck disable=SC2068
 gclone_repo $@ > /tmp/gclone_output_023mf023mf
 EXIT_CODE=$?
 
@@ -11,8 +13,9 @@ fi
 
 DIR=$(cat /tmp/gclone_output_023mf023mf)
 
-if [ -z $YK_FISH_EXISTS ]; then
-    cd $DIR
+if [ -z "$YK_FISH_EXISTS" ]; then
+    # shellcheck disable=SC2164
+    cd "$DIR"
 else
-    echo $DIR
+    echo "$DIR"
 fi

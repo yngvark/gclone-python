@@ -1,4 +1,4 @@
 #!/usr/bin/env fish
-set DIR (gclone_repo $argv)
+set DIR $(gclone_repo $argv)
 echo Changing to: $DIR
 cd $DIR

@@ -3,10 +3,10 @@ import argparse
 import os
 import sys
 from pathlib import Path
-import subprocess
 from subprocess import Popen, PIPE
 
 DEFAULT_REPO_ENV_NAME = "REPONEW_DEFAULT_ORGANIZATION"
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Creates a new Github repository.")
@@ -22,19 +22,23 @@ def parse_args():
 
     return parser.parse_args()
 
+
 def print_err(txt):
     print(txt, file=sys.stderr)
 
+
 def validate_args(args):
     error = False
+    err = None
 
     if len(args.repoId.split("/")) > 2:
         err = "repoId must be on the form: org/repo"
         error = True
 
     if error:
-        print_err("ERROR: " + err, file=sys.stderr)
+        print_err("ERROR: " + str(err))
         sys.exit(1)
+
 
 def get_organization(repoId):
     split = repoId.split("/")
@@ -49,11 +53,14 @@ def get_organization(repoId):
 
     return split[0]
 
+
 def default_org():
     return os.environ.get("REPONEW_DEFAULT_ORGANIZATION")
 
+
 def get_repository_name(repoId):
     return repoId.split("/")[-1]
+
 
 def git_dir():
     dir = os.environ.get("GCLONE_GIT_DIR")
@@ -62,6 +69,7 @@ def git_dir():
             + "repositories"
     
     return dir
+
 
 def create_dir(dir):
     if os.path.exists(dir):
@@ -72,11 +80,13 @@ def create_dir(dir):
     #print_err(f"Creating directory {repoDir}")
     Path(repoDir).mkdir(parents=True, exist_ok=True)
 
+
 def get_private_public_arg(privateArg):
     if privateArg:
         return "--private"
 
     return "--public"
+
 
 def run_cmd(cmd, repoDir):
     print_err("Command: " + " ".join(cmd))
@@ -86,9 +96,10 @@ def run_cmd(cmd, repoDir):
         print_err("ERROR, response from gh (exit code %d): %s %s" % (p.returncode, output, error))
         sys.exit(1)
 
+
 args = parse_args()
-#print_err("ARGS:")
-#print_err(args)
+# print_err("ARGS:")
+# print_err(args)
 
 validate_args(args)
 
@@ -98,24 +109,23 @@ gitDir = git_dir()
 repoDir = Path(gitDir).joinpath(org).joinpath(repo)
 privatePublicArg = get_private_public_arg(args.private)
 
-#print_err("org: " + org)
-#print_err("repo: " + repo)
+# print_err("org: " + org)
+# print_err("repo: " + repo)
 
 if not args.dry_run:
     create_dir(repoDir)
 else:
-    print_err(f"DEBUG: Not creating dir {repoDir}")
-
-# subprocess.run(["git", "init"], check=True, cwd=repoDir, stdout=subprocess.DEVNULL)
+    print_err(f"DRY-RUN: Would create dir {repoDir}")
 
 org_with_repo = f"{org}/{repo}"
 
 cmd = ["gh", "repo", "create", "--clone", org_with_repo, privatePublicArg]
-if args.template != None and len(args.template) > 0:
+
+if args.template is not None and len(args.template) > 0:
     cmd.append("--template")
     cmd.append(args.template)
 
-if args.description != None and len(args.description) > 0:
+if args.description is not None and len(args.description) > 0:
     cmd.append("--description")
     cmd.append(args.description)
 

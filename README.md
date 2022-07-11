@@ -68,7 +68,7 @@ rm ~/.local/bin/newrepo
 $ clonerepo -h
 usage: gclone_repo [-h] [-t] repoUri
 
-git clones a repo URI to the appropriate directory. Tip: use ". gclone_repo <args>"
+git clones a repo URI to the appropriate directory. Tip: use ". clonerepo <args>"
 to change directory to cloned directory.
 
 positional arguments:
@@ -88,7 +88,7 @@ Requirements:
 $ newrepo -h
 usage: gclone_reponew [-h] [-n | --dry-run | --no-dry-run] [-p | --private | --no-private] [-t TEMPLATE] [-d DESCRIPTION] repoId
 
-Creates a new Github repository. Tip: use ". gclone_newrepo <args>"
+Creates a new Github repository. Tip: use ". newrepo <args>"
 to change directory to cloned directory.
 
 positional arguments:

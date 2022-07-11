@@ -55,7 +55,7 @@ def print_invalid_gir_uri_message(invalid_input):
 
 # Parse args
 parser = argparse.ArgumentParser(description="git clones a repo URI to the appropriate directory. Tip: "
-                                             + "use \". gclone_repo <args>\" to change directory to cloned directory.")
+                                             + "use \". clonerepo <args>\" to change directory to cloned directory.")
 parser.add_argument("repoUri", type=str, help="URI of the repo to clone")
 parser.add_argument("-t", "--temp", action='store_true', default=False, help="Clone the repository in a temporary directory")
 

@@ -36,7 +36,7 @@ def get_org_from_git_uri(git_repo_uri):
 
 # https://github.com/yngvark/aws-console-signin-robot.git > aws-console-signin-robot
 def get_reponame_from_git_uri(git_repo_uri):
-    pattern = re.compile(r'([a-zA-Z\d\-_]+)\.git')
+    pattern = re.compile(r'([a-zA-Z\d.\-_]+)\.git')
 
     matches = re.findall(pattern, git_repo_uri)
     if len(matches) > 0:
@@ -55,7 +55,7 @@ def print_invalid_gir_uri_message(invalid_input):
 
 # Parse args
 parser = argparse.ArgumentParser(description="git clones a repo URI to the appropriate directory. Tip: "
-                                             + "use \". gclone <args>\" to change directory to cloned directory.")
+                                             + "use \". gclone_repo <args>\" to change directory to cloned directory.")
 parser.add_argument("repoUri", type=str, help="URI of the repo to clone")
 parser.add_argument("-t", "--temp", action='store_true', default=False, help="Clone the repository in a temporary directory")
 
@@ -63,16 +63,15 @@ args = parser.parse_args()
 
 # Get org and repo from URI
 try:
-    org = get_org_from_git_uri(args.repoUrl)
+    org = get_org_from_git_uri(args.repoUri)
 except ValueError:
-    print_invalid_gir_uri_message(args.repoUrl)
+    print_invalid_gir_uri_message(args.repoUri)
     sys.exit(1)
 
-print("Organization: " + org, file=sys.stderr)
 try:
-    reponameDir = get_reponame_from_git_uri(args.repoUrl)
+    repo_dir = get_reponame_from_git_uri(args.repoUri)
 except ValueError:
-    print_invalid_gir_uri_message(args.repoUrl)
+    print_invalid_gir_uri_message(args.repoUri)
     sys.exit(1)
 
 # Clone or pull repo
@@ -85,15 +84,23 @@ else:
 if not os.path.exists(gitDir):
     os.makedirs(gitDir)
 
-cloneDir = Path(gitDir).joinpath(org).joinpath(reponameDir)
+cloneDir = Path(gitDir).joinpath(org).joinpath(repo_dir)
 
-Path(cloneDir.parent).mkdir(parents=True, exist_ok=True)
+# Path(cloneDir.parent).mkdir(parents=True, exist_ok=True)
 
 if os.path.exists(cloneDir):
-    print(f"Pulling in existing directory: {cloneDir}", file=sys.stderr)
-    subprocess.run(["git", "pull"], check=True, cwd=cloneDir, stdout=subprocess.DEVNULL)
+    print(f"Running git pull existing directory: {cloneDir}", file=sys.stderr)
+    try:
+        subprocess.run(["git", "pull"], check=True, cwd=cloneDir, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print_err("Unexpected error: " + str(e))
+        sys.exit(e.returncode)
 else:
-    print(f"Cloning in directory: {cloneDir}", file=sys.stderr)
-    subprocess.run(["git", "clone", args.repoUrl], check=True, cwd=cloneDir.parent, stdout=subprocess.DEVNULL)
+    print(f"Cloning into directory: {cloneDir}", file=sys.stderr)
+    try:
+        subprocess.run(["git", "clone", args.repoUri], check=True, cwd=cloneDir.parent, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as e:
+        print_err("Unexpected error: " + str(e))
+        sys.exit(e.returncode)
 
 print(cloneDir)

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# USAGE: . gclone <repo URI>
+# USAGE: . clonerepo <repo URI>
+
+ME=$(readlink "${BASH_SOURCE[0]}")
+APP_DIR=$(dirname "$ME")
 
 # shellcheck disable=SC2068
-gclone_repo $@ > /tmp/gclone_output_023mf023mf
+"$APP_DIR/gclone_repo" $@ > /tmp/gclone_output_023mf023mf
 EXIT_CODE=$?
 
 # Error checking

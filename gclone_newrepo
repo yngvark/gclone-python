@@ -9,7 +9,8 @@ DEFAULT_REPO_ENV_NAME = "REPONEW_DEFAULT_ORGANIZATION"
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Creates a new Github repository.")
+    parser = argparse.ArgumentParser(description="Creates a new Github repository. Tip: "
+                                                 + "use \". gclone_reponew <args>\" to change directory to cloned directory.")
     parser.add_argument("repoId", type=str, help="Organization (optinal) and repository name. Example: myorg/myrepo")
     parser.add_argument("-n", "--dry-run", action=argparse.BooleanOptionalAction, help="Don't make any changes")
     parser.add_argument("-p", "--private", action=argparse.BooleanOptionalAction, help="Make the new repository private")

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# USAGE: . newrepo somerepo
+
+ME=$(readlink "${BASH_SOURCE[0]}")
+APP_DIR=$(dirname "$ME")
+
+if [[ $* == "-h" || -z "$1" ]]; then
+    "$APP_DIR/gclone_reponew" -h
+    exit 0
+fi
+
+# shellcheck disable=SC2068
+DIR=$("$APP_DIR/gclone_reponew" $@)
+echo cd "$DIR"
+
+# shellcheck disable=SC2164
+cd "$DIR"

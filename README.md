@@ -1,8 +1,10 @@
-Gclone consists of two scripts:
+# Gclone
+
+Gclone consists of two commands:
 * `clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
 * `newrepo` creates git repositories into a pre-determined directory structure, and then `cd`s into the directory containing the repository.
 
-#### Example: clonerepo
+**Example: clonerepo**
 
 ```sh
 /tmp $ . clonerepo https://github.com/yngvark/gclone.git
@@ -20,7 +22,7 @@ Resolving deltas: 100% (7/7), done.
 
 Notice that `clonerepo` changed the current directory (where the parent path is configurable).
 
-#### Example: newrepo
+**Example: newrepo**
 
 ```sh
 /tmp $ . newrepo my-new-repo
@@ -31,7 +33,7 @@ cd /home/myself/git/my-github-username/my-new-repo
 
 Notice that `newrepo` changed the current directory to the new repository's directory (where the parent path is configurable).
 
-# Install
+## Install
 
 ```sh
 cd wherever-you-put-your-applications-or-repos
@@ -51,7 +53,7 @@ export REPONEW_DEFAULT_ORGANIZATION="my-git-username"
 
 ToDo: Put this into config file or something instead.
 
-## Uninstall
+### Uninstall
 
 ```sh
 cd wherever-you-put-your-applications-or-repos
@@ -60,9 +62,9 @@ rm ~/.local/bin/clonerepo
 rm ~/.local/bin/newrepo
 ```
 
-# Usage
+## Usage
 
-## Clone repositories
+### Clone repositories
 
 ```sh
 $ clonerepo -h
@@ -79,7 +81,7 @@ optional arguments:
   -t, --temp  Clone the repository in a temporary directory
 ```
 
-## Create repositories
+### Create repositories
 
 Requirements:
 * [gh](https://cli.github.com/)
@@ -106,7 +108,7 @@ optional arguments:
                         the description for the repository
 ```
 
-## Fish shell support
+### Fish shell support
 
 In Fish shell, `.` and `source` don't work. To support Fish, you can install [fs](https://github.com/yngvark/fs).
 

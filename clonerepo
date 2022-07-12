@@ -5,7 +5,7 @@ ME=$(readlink "${BASH_SOURCE[0]}")
 APP_DIR=$(dirname "$ME")
 
 # shellcheck disable=SC2068
-"$APP_DIR/gclone_repo" $@ > /tmp/gclone_output_023mf023mf
+"$APP_DIR/clonerepo.py" $@ > /tmp/gclone_output_023mf023mf
 EXIT_CODE=$?
 
 # Error checking

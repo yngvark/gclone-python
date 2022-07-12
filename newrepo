@@ -4,14 +4,21 @@
 ME=$(readlink "${BASH_SOURCE[0]}")
 APP_DIR=$(dirname "$ME")
 
-if [[ $* == "-h" || -z "$1" ]]; then
-    "$APP_DIR/gclone_reponew" -h
-    exit 0
+# shellcheck disable=SC2068
+"$APP_DIR/newrepo.py" $@ > /tmp/gclone_output_023mf023mf
+EXIT_CODE=$?
+
+# Error checking
+if [[ $EXIT_CODE != 0 ]]; then
+    cat /tmp/gclone_output_023mf023mf
+    exit $EXIT_CODE
 fi
 
-# shellcheck disable=SC2068
-DIR=$("$APP_DIR/gclone_reponew" $@)
-echo cd "$DIR"
+DIR=$(cat /tmp/gclone_output_023mf023mf)
 
-# shellcheck disable=SC2164
-cd "$DIR"
+if [ -z "$YK_FISH_EXISTS" ]; then
+    # shellcheck disable=SC2164
+    cd "$DIR"
+else
+    echo "$DIR"
+fi

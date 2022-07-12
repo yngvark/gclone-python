@@ -9,15 +9,14 @@ DEFAULT_REPO_ENV_NAME = "REPONEW_DEFAULT_ORGANIZATION"
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Creates a new Github repository. Tip: "
-                                                 + "use \". newrepo <args>\" to change directory to cloned directory.")
+    prog = "newrepo"
+    parser = argparse.ArgumentParser(prog=prog, description="Creates a new Github repository. Tip: "
+                                                            + f"use \". {prog} <args>\" to change directory to cloned directory.")
     parser.add_argument("repoId", type=str, help="Organization (optinal) and repository name. Example: myorg/myrepo")
     parser.add_argument("-n", "--dry-run", action=argparse.BooleanOptionalAction, help="Don't make any changes")
     parser.add_argument("-p", "--private", action=argparse.BooleanOptionalAction, help="Make the new repository private")
     parser.add_argument("-t", "--template", type=str, help="repository for template. For instance 'myorg/mytemplaterepo'")
     parser.add_argument("-d", "--description", type=str, help="the description for the repository")
-
-    # When python 3.9 arrives:
 
     return parser.parse_args()
 

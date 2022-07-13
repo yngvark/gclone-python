@@ -1,6 +1,9 @@
 # Gclone
 
-Gclone consists of two commands:
+Gclone helps with cloning and creating repositories.
+
+It consists of two commands:
+
 * `clonerepo` clones git repositores into a pre-determined directory structure, and then `cd`s into the cloned directory.
 * `newrepo` creates git repositories into a pre-determined directory structure, and then `cd`s into the directory containing the repository.
 

@@ -16,9 +16,5 @@ fi
 
 DIR=$(cat /tmp/gclone_output_023mf023mf)
 
-if [ -z "$YK_FISH_EXISTS" ]; then
-    # shellcheck disable=SC2164
-    cd "$DIR"
-else
-    echo "$DIR"
-fi
+# shellcheck disable=SC2164
+cd "$DIR"

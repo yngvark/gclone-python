@@ -18,3 +18,4 @@ DIR=$(cat /tmp/gclone_output_023mf023mf)
 
 # shellcheck disable=SC2164
 cd "$DIR"
+echo "$DIR"
